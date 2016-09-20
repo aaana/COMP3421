@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="real-estate">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="agencies">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="agency" type="agencyType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="owners">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="owner" type="ownerType" maxOccurs="unbounded"/>
+						</xs:sequence>
+						<xs:attribute name="identifier" type="xs:ID" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="properties">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="property" type="propertyType" maxOccurs="unbounded"/>
+						</xs:sequence>
+						<xs:attribute name="identifier" type="xs:ID" use="required"/>
+						<xs:attribute name="owners-of" type="xs:IDREF" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="flats">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="flat" type="flatType" maxOccurs="unbounded"/>
+						</xs:sequence>
+						<xs:attribute name="identifier" type="xs:ID" use="required"/>
+						<xs:attribute name="properties-of" type="xs:IDREF" use="required"/>			
+						<xs:attribute name="comfort-levels" type="xs:string" use="required"/>	
+						<xs:attribute name="post-date" type="xs:date" use="optional"/>		
+					</xs:complexType>
+				</xs:element>
+		
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="agencyType">
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="e-mail" type="xs:string"/>
+			<xs:attribute name="phone" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="ownerType">
+			<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="propertyType">
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="number-of-flats" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="flatType">
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="description" type="xs:string"/>
+			<xs:attribute name="rate" type="xs:string"/>
+	</xs:complexType>
+	
+</xs:schema>
