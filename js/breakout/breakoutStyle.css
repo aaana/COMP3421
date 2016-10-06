@@ -1,0 +1,26 @@
+*{
+	padding: 0; 
+	margin: 0; 
+} 
+
+canvas{ 
+	background: #eee; 
+	display: block; 
+	margin: 20px auto; 
+} 
+
+.controlPannel{
+	margin: 10px auto;
+	width: 480px;
+}   
+
+.controlButton{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #0095DD;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
