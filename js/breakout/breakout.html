@@ -23,45 +23,134 @@
         <option>5</option> 
         <option>6</option> 
     </select>
+    <span>Speed</span>
+    <select id="speedSelect"> 
+        <option>1</option> 
+        <option>2</option> 
+        <option>3</option> 
+    </select>
     <span class="maxTime">
         <span>Timer:</span>
         <input id="inputHour" onfocus="clearInput(this)" type="text" value="0" /><span>h</span>
         <input id="inputMin" onfocus="clearInput(this)" type="text" value="1" /><span>m</span>
         <input id="inputSecond" onfocus="clearInput(this)" type="text" value="0" /><span>s</span>
     </span>
-    <button type="button" id="about" data-toggle="modal" data-target="#myModal">
+    <button type="button" id="about" data-toggle="modal" data-target="#aboutModal">
         <span class="glyphicon glyphicon-info-sign" ></span>
+    </button>
+    <button type="button" id="special" data-toggle="modal" data-target="#specialDesignModal">
+        <span class="glyphicon glyphicon-heart" ></span>
     </button>
 </div>
 
 <canvas id="myCanvas"></canvas>
 <div class="controlPannel">
     <input type="button" style="margin-left:50px" id="startButton" class="controlButton" onclick="start()" value="Start"></input>
- 
     <input type="button" style="margin-left:200px" class="controlButton" onclick="init()" value="Replay"></input>
-
-
-
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">About</h4>
+  <div class="modal fade" id="aboutModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Readme</h4>
       </div>
       <div class="modal-body">
-        <p>In the game, a layer of bricks lines the top third of the screen. A ball travels across the screen, bouncing off the top and side walls of the screen. When a brick is hit, the ball bounces away and the brick is destroyed. The player loses a turn when the ball touches the bottom of the screen. To prevent this from happening, the player has a movable paddle to bounce the ball upward, keeping it in play. </p>
+        <p>
+            <b><big>The main functions:</big></b><br/>&nbsp&nbsp&nbsp&nbsp&nbsp1. 6 different brick patterns representing 6 levels<br/>&nbsp&nbsp&nbsp&nbsp&nbsp2. Each brick pattern have at least 4 layers and 8 bricks per layer<br/>&nbsp&nbsp&nbsp&nbsp&nbsp3. A player can choose to have 1/2 paddles<br/>&nbsp&nbsp&nbsp&nbsp&nbsp4. The game stops when time out or replay<br/>&nbsp&nbsp&nbsp&nbsp&nbsp5. The movements can be controlled by the keyboard or the mouse<br/>
+        </p>
         <p>
         <pre>
-        	<b>Keys:</b>
-        		space  --  start/pause
-        		left   --  move left
-        		right  --  move right
-        </pre>
+<b>Keys:</b>
+    space  --  start/pause
+    left   --  move left
+    right  --  move right
+</pre>
         </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Okay</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+  <div class="modal fade" id="specialDesignModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Special Concerns</h4>
+      </div>
+      <div class="modal-body">
+        <p>
+            <b><big>The special design for the elder:</big></b></br>
+        </p>
+        <table class="table table-bordered table-responsive">
+            <tr><th>Aspect</th><th>Solution</th></tr>
+            <tr>
+                <td>Timer turns red when 10 seconds left.</td>
+                <td>
+<pre>
+function drawTimer() {
+    ctx.font = "16px Helvetica";
+    if(n_hour ==0 &&n_min==0 && n_sec<10){
+        ctx.fillStyle = "red";
+    }else{
+        ctx.fillStyle = "#0095DD";
+    }
+    ctx.fillText(ele_timer, canvas.width/2-30, 20);
+}
+</pre>             
+                </td>
+            </tr>
+            <tr>
+                <td>The SPACE KEY to control start/pause/resume</td>
+                <td>
+<pre>
+function keyDownHandler(e) {
+    ...
+    // It is a trick to prevent the modal window poping up
+    else if(e.keyCode == 32){      
+        document.getElementById("about").blur();
+        document.getElementById("levelSelect").blur();
+    }  
+}
+function keyUpHandler(e) {
+    ...
+    else if(e.keyCode == 32){          
+        start();
+    }  
+}
+function start(){
+    var startButton = document.getElementById("startButton");
+    if(statusFlag==0){
+        init();
+        startButton.value = "Stop";
+        n_timer = timer();
+        globalAnimationID = requestAnimationFrame(draw);
+        statusFlag = 2;
+    }else if(statusFlag==1){//stop -> Resume
+        startButton.value = "Stop";
+        n_timer = timer();
+        statusFlag = 2;
+        globalAnimationID = requestAnimationFrame(draw);
+    }else{ //resume -> stop
+        startButton.value = "Resume";
+        clearInterval(n_timer);
+        statusFlag = 1;
+        cancelAnimationFrame(globalAnimationID);
+    }
+}
+</pre>
+                </td>
+            </tr>
+
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -140,6 +229,7 @@
     //0:初次开始 1:stop 2:resume
     var statusFlag;
     var level;
+    var speed;
     var globalAnimationID;
     // for(r=0; r<brickRowCount; r++) {
     //     bricks[r] = [];
@@ -154,7 +244,7 @@
     document.addEventListener("keydown",keyDownHandler,false);
     document.addEventListener("keyup",keyUpHandler,false);
 
-   function keyDownHandler(e) {
+    function keyDownHandler(e) {
         // missing code here
         if(e.keyCode == 39){
             rightPressed = true;
@@ -164,6 +254,7 @@
             console.log("leftPressed");
         }else if(e.keyCode == 32){     // It is a trick to prevent the about the modal window poping up	
             document.getElementById("about").blur();
+            document.getElementById("special").blur();
             document.getElementById("levelSelect").blur();
         }  
     }
@@ -288,8 +379,9 @@
     function init(){
         ballRadius = 10;
         level = document.getElementById("levelSelect").value;
-        dx = 2;
-        dy = -2;
+        speed = document.getElementById("speedSelect").value;
+        dx = 1.5*speed;
+        dy = -1.5*speed;
         paddleHeight = 10;
         paddleWidth = 75;
         rightPressed = false;
@@ -369,8 +461,8 @@
                 else {
                     x = canvas.width/2;
                     y = canvas.height-30;
-                    dx = 3;
-                    dy = -3;
+                    // dx = 3;
+                    // dy = -3;
                     paddleX = (canvas.width-paddleWidth)/2;
                 }
             }

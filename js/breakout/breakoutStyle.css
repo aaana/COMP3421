@@ -34,21 +34,33 @@ canvas{
     width: 80px;
 } 
 
-#about{
+#about,#special{
 	background: transparent;
 	border: none;
 	font-size: 25px;
 	padding: 6px;
-	color: #286090;
 	position: relative;
 	top: 8px;
-	margin-left:60px;
+
 }
 
 #about:hover{
 
 	color: #204d74;
-	margin-left: 60px;
+}
+
+#about{
+	margin-left: 30px;
+	color: #286090;
+
+}
+#special{
+	margin-left: 10px;
+	color: #F5A9A9;
+}
+
+#special:hover{
+	color: #FA5858;
 }
 
 .gamehead{
@@ -68,8 +80,8 @@ canvas{
 	color: #286090;
 }
 
-#levelSelect{
-	width: 70px;
+#levelSelect,#speedSelect{
+	width: 60px;
 	height: 30px;
     padding: 6px 12px;
     font-size: 14px;
@@ -79,7 +91,9 @@ canvas{
     background-image: none;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-right: 60px;
+}
+#speedSelect{
+	margin-right: 5px;
 }
 
 .maxTime > input{
@@ -87,5 +101,7 @@ canvas{
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	text-align: right;
+	margin-right: 2px;
 }
+
 
