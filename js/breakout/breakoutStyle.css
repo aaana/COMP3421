@@ -6,7 +6,7 @@
 canvas{ 
 	background: #eee; 
 	display: block; 
-	margin: 20px auto; 
+	margin: 0 auto; 
 } 
 
 .controlPannel{
@@ -18,9 +18,40 @@ canvas{
     padding: 6px;
     border-radius: 3px;
     border: none;
-    background-color: #0095DD;
+    background-color: #286090;
     color: white;
     font-size: 15px;
     width: 80px;
 } 
+
+.controlButton:hover{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #204d74;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
+#about{
+	background: transparent;
+	border: none;
+	font-size: 25px;
+	padding: 6px;
+	color: #286090;
+}
+
+.gamehead{
+	margin: 0 auto;
+	margin-top: 10px;
+	position: relative;
+	width:480px;
+	/*text-align: center;*/
+	left: 200px;
+	color: black;
+	font-weight: bold;
+	font-size: 18px;
+}
+
 
