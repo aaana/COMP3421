@@ -40,18 +40,52 @@ canvas{
 	font-size: 25px;
 	padding: 6px;
 	color: #286090;
+	position: relative;
+	top: 8px;
+	margin-left:60px;
+}
+
+#about:hover{
+
+	color: #204d74;
+	margin-left: 60px;
 }
 
 .gamehead{
-	margin: 0 auto;
-	margin-top: 10px;
-	position: relative;
+	margin: 10px auto 0 auto;
 	width:480px;
-	/*text-align: center;*/
-	left: 200px;
+	text-align: center;
 	color: black;
 	font-weight: bold;
 	font-size: 18px;
 }
 
+.levelDiv{
+	margin: 0 auto;
+	width: 550px;
+	text-align: center;
+	font-weight: bold;
+	color: #286090;
+}
+
+#levelSelect{
+	width: 70px;
+	height: 30px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 60px;
+}
+
+.maxTime > input{
+	width: 40px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	text-align: right;
+}
 

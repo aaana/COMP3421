@@ -10,12 +10,31 @@
 <body>
 
 <div class="gamehead">
-	<span>Breakout</span> 
-	<button style="margin-left:160px" type="button" id="about" data-toggle="modal" data-target="#myModal">
-		<span class="glyphicon glyphicon-info-sign" ></span>
-	</button>
+    Breakout
 </div>
-<canvas id="myCanvas" width="480" height="320"></canvas>
+
+<div class="levelDiv">
+    <span>Level</span>
+    <select id="levelSelect"> 
+        <option>1</option> 
+        <option>2</option> 
+        <option>3</option> 
+        <option>4</option> 
+        <option>5</option> 
+        <option>6</option> 
+    </select>
+    <span class="maxTime">
+        <span>Timer:</span>
+        <input id="inputHour" onfocus="clearInput(this)" type="text" value="0" /><span>h</span>
+        <input id="inputMin" onfocus="clearInput(this)" type="text" value="1" /><span>m</span>
+        <input id="inputSecond" onfocus="clearInput(this)" type="text" value="0" /><span>s</span>
+    </span>
+    <button type="button" id="about" data-toggle="modal" data-target="#myModal">
+        <span class="glyphicon glyphicon-info-sign" ></span>
+    </button>
+</div>
+
+<canvas id="myCanvas"></canvas>
 <div class="controlPannel">
     <input type="button" style="margin-left:50px" id="startButton" class="controlButton" onclick="start()" value="Start"></input>
  
@@ -53,71 +72,79 @@
 </div>
 
 <script>
-    var n_sec = 0;  //秒
-    var n_min = 0;  //分
-    var n_hour = 0; //时
-    var ele_timer ="00:00:00";
+    var n_sec;  //秒
+    var n_min;  //分
+    var n_hour; //时
+    var ele_timer;
+
+    function timeStr(h,m,s){
+
+        var str_hour = h;
+        var str_min = m;
+        var str_sec = s;
+        if ( n_hour < 10 ) {
+            str_hour = "0" + n_hour;
+        }
+        if ( n_min < 10 ) {
+            str_min = "0" + n_min;
+        }
+        if ( n_sec < 10) {
+            str_sec = "0" + n_sec;
+        }
+        var time = str_hour + ":" + str_min + ":" + str_sec;    
+        return time;    
+    }
     
     function timer() {
       	
       	return setInterval(function () {
-
-        	var str_sec = n_sec;
-          	var str_min = n_min;
-          	var str_hour = n_hour;
-          	if ( n_sec < 10) {
-              	str_sec = "0" + n_sec;
-          	}
-          	if ( n_min < 10 ) {
-              	str_min = "0" + n_min;
-          	}
-
-	        if ( n_hour < 10 ) {
-	            str_hour = "0" + n_hour;
+	        ele_timer = timeStr(n_hour,n_min,n_sec);
+	        n_sec--;
+	        if (n_sec < 0){
+	            n_sec = 59;
+	            n_min--;
 	        }
-
-	        var time = str_hour + ":" + str_min + ":" + str_sec;
-	        ele_timer = time;
-	        n_sec++;
-	        if (n_sec > 59){
-	            n_sec = 0;
-	            n_min++;
-	        }
-	        if (n_min > 59) {
-	            n_sec = 0;
-	            n_hour++;
+	        if (n_min < 0) {
+	            n_min = 59;
+                n_sec = 0;
+	            n_hour--;
 	        }
        }, 1000);
     }
+    var brickRowCounts = [4,5,6,7,8,9];
+    var brickColumnCounts = [8,8,9,9,10,11];
+
     var n_timer;
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
-    var ballRadius = 10;
-    var x = canvas.width/2;
-    var y = canvas.height-30;
-    var dx = 2;
-    var dy = -2;
-    var paddleHeight = 10;
-    var paddleWidth = 75;
-    var paddleX = (canvas.width-paddleWidth)/2;
-    var rightPressed = false;
-    var leftPressed = false;
-    var brickRowCount = 5;
-    var brickColumnCount = 3;
-    var brickWidth = 75;
-    var brickHeight = 20;
-    var brickPadding = 10;
-    var brickOffsetTop = 30;
-    var brickOffsetLeft = 30;
-    var score = 0;
-    var lives = 3;
-    var bricks = [];
-    var stopFlag = true;
+    var ballRadius;
+    var x;
+    var y;
+    var dx;
+    var dy;
+    var paddleHeight;
+    var paddleWidth;
+    var paddleX;
+    var rightPressed;
+    var leftPressed;
+    var brickRowCount;
+    var brickColumnCount;
+    var brickWidth;
+    var brickHeight;
+    var brickPadding;
+    var brickOffsetTop;
+    var brickOffsetLeft;
+    var score;
+    var lives;
+    var bricks;
+    //0:初次开始 1:stop 2:resume
+    var statusFlag;
+    var level;
     var globalAnimationID;
-    // for(c=0; c<brickColumnCount; c++) {
-    //     bricks[c] = [];
-    //     for(r=0; r<brickRowCount; r++) {
-    //         bricks[c][r] = { x: 0, y: 0, status: 1 };
+    // for(r=0; r<brickRowCount; r++) {
+    //     bricks[r] = [];
+    //     for(c=0; c<brickColomnCount; c++) {
+    //         bricks[r][c] = { x: 0, y: 0, status: 1 };
     //     }
     // }
     
@@ -137,6 +164,7 @@
             console.log("leftPressed");
         }else if(e.keyCode == 32){     // It is a trick to prevent the about the modal window poping up	
             document.getElementById("about").blur();
+            document.getElementById("levelSelect").blur();
         }  
     }
     function keyUpHandler(e) {
@@ -157,24 +185,34 @@
         }
     }
 
+    function clearInput(self){
+        self.value ="";
+    }
+
     function start(){
         var startButton = document.getElementById("startButton");
-        if(stopFlag){
+        if(statusFlag==0){
+            init();
             startButton.value = "Stop";
             n_timer = timer();
-            stopFlag = false;
             globalAnimationID = requestAnimationFrame(draw);
-        }else{
+            statusFlag = 2;
+        }else if(statusFlag==1){//stop -> Resume
+            startButton.value = "Stop";
+            n_timer = timer();
+            statusFlag = 2;
+            globalAnimationID = requestAnimationFrame(draw);
+        }else{ //resume -> stop
             startButton.value = "Resume";
             clearInterval(n_timer);
-            stopFlag = true;
+            statusFlag = 1;
             cancelAnimationFrame(globalAnimationID);
         }
     }
     function collisionDetection() {
-        for(c=0; c<brickColumnCount; c++) {
-            for(r=0; r<brickRowCount; r++) {
-                var b = bricks[c][r];
+        for(r=0; r<brickRowCount; r++) {
+            for(c=0; c<brickColumnCount; c++) {
+                var b = bricks[r][c];
                 if(b.status == 1) {
                     // if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
                     //     dy = -dy;
@@ -213,13 +251,13 @@
         ctx.closePath();
     }
     function drawBricks() {
-        for(c=0; c<brickColumnCount; c++) {
-            for(r=0; r<brickRowCount; r++) {
-                if(bricks[c][r].status == 1) {
-                    var brickX = (r*(brickWidth+brickPadding))+brickOffsetLeft;
-                    var brickY = (c*(brickHeight+brickPadding))+brickOffsetTop;
-                    bricks[c][r].x = brickX;
-                    bricks[c][r].y = brickY;
+        for(r=0; r<brickRowCount; r++) {
+            for(c=0; c<brickColumnCount; c++) {
+                if(bricks[r][c].status == 1) {
+                    var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+                    var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+                    bricks[r][c].x = brickX;
+                    bricks[r][c].y = brickY;
                     ctx.beginPath();
                     ctx.rect(brickX, brickY, brickWidth, brickHeight);
                     ctx.fillStyle = "#0095DD";
@@ -239,41 +277,52 @@
     }
     function drawTimer() {
         ctx.font = "16px Helvetica";
-        ctx.fillStyle = "#0095DD";
+        if(n_hour ==0 &&n_min==0 && n_sec<10){
+            ctx.fillStyle = "red";
+        }else{
+            ctx.fillStyle = "#0095DD";
+
+        }
         ctx.fillText(ele_timer, canvas.width/2-30, 20);
     }
     function init(){
         ballRadius = 10;
-        x = canvas.width/2;
-        y = canvas.height-30;
+        level = document.getElementById("levelSelect").value;
         dx = 2;
         dy = -2;
         paddleHeight = 10;
         paddleWidth = 75;
-        paddleX = (canvas.width-paddleWidth)/2;
         rightPressed = false;
         leftPressed = false;
-        brickRowCount = 5;
-        brickColumnCount = 3;
+        brickRowCount = brickRowCounts[level-1];
+        brickColumnCount = brickColumnCounts[level-1];
         brickWidth = 75;
         brickHeight = 20;
         brickPadding = 10;
         brickOffsetTop = 30;
         brickOffsetLeft = 30;
+        bricks = [];
         score = 0;
         lives = 3;
-        bricks = [];
-        stopFlag = true;
-        for(c=0; c<brickColumnCount; c++) {
-            bricks[c] = [];
-            for(r=0; r<brickRowCount; r++) {
-                bricks[c][r] = { x: 0, y: 0, status: 1 };
+        statusFlag = 0;
+        document.getElementById("myCanvas").width = 2*brickOffsetLeft + brickColumnCount*brickWidth +(brickColumnCount-1)*brickPadding;
+        document.getElementById("myCanvas").height = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +150 ;
+        x = canvas.width/2;
+        y = canvas.height-30;
+
+        paddleX = (canvas.width-paddleWidth)/2;
+
+        for(r=0; r<brickRowCount; r++) {
+            bricks[r] = [];
+            for(c=0; c<brickColumnCount; c++) {
+                bricks[r][c] = { x: 0, y: 0, status: 1 };
             }
         }
-        n_sec = 0;  //秒
-        n_min = 0;  //分
-        n_hour = 0; //时
-        ele_timer ="00:00:00";
+        n_sec = document.getElementById("inputSecond").value==""?0:document.getElementById("inputSecond").value;  //秒
+        n_min = document.getElementById("inputMin").value==""?0:document.getElementById("inputMin").value;  //分
+        n_hour = document.getElementById("inputHour").value==""?0:document.getElementById("inputHour").value; //时
+        ele_timer = timeStr(n_hour,n_min,n_sec);
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBricks();
         drawBall();
@@ -297,6 +346,10 @@
         drawLives();
         drawTimer();
         collisionDetection();
+        if(n_hour==n_min&&n_min==n_sec&&n_sec==0){
+            alert("TIME OUT");
+            document.location.reload();
+        }
         if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
             dx = -dx;
         }
