@@ -35,6 +35,11 @@
         <input id="inputMin" onfocus="clearInput(this)" type="text" value="1" /><span>m</span>
         <input id="inputSecond" onfocus="clearInput(this)" type="text" value="0" /><span>s</span>
     </span>
+    <span>Paddle#</span>
+    <select id="paddleSelect"> 
+        <option>1</option> 
+        <option>2</option> 
+    </select>
     <button type="button" id="about" data-toggle="modal" data-target="#aboutModal">
         <span class="glyphicon glyphicon-info-sign" ></span>
     </button>
@@ -49,6 +54,7 @@
     <input type="button" style="margin-left:200px" class="controlButton" onclick="init()" value="Replay"></input>
 </div>
 
+<!-- Readme Modal Dialog!!! -->
 <!-- Modal -->
   <div class="modal fade" id="aboutModal" role="dialog">
     <div class="modal-dialog modal-lg">
@@ -65,8 +71,13 @@
         <pre>
 <b>Keys:</b>
     space  --  start/pause
-    left   --  move left
-    right  --  move right
+    <b>Paddle#1:</b>
+        <i>can be controlled by mouse</i>
+        left   --  move left
+        right  --  move right
+    <b>Paddle#2:</b>
+        A      --  move left
+        B      --  move right 
 </pre>
         </p>
       </div>
@@ -165,6 +176,7 @@ function start(){
     var n_min;  //分
     var n_hour; //时
     var ele_timer;
+    var isBounced;
 
     function timeStr(h,m,s){
 
@@ -213,7 +225,8 @@ function start(){
     var dy;
     var paddleHeight;
     var paddleWidth;
-    var paddleX;
+    var paddleXs;
+    var paddlePadding;
     var rightPressed;
     var leftPressed;
     var brickRowCount;
@@ -252,6 +265,12 @@ function start(){
         }else if (e.keyCode == 37) {
             leftPressed = true;
             console.log("leftPressed");
+        }else if(e.keyCode == 65){
+            aPressed = true;
+            console.log("A pressed");
+        }else if(e.keyCode == 68){
+            dPressed = true;
+            console.log("D pressed");
         }else if(e.keyCode == 32){     // It is a trick to prevent the about the modal window poping up	
             document.getElementById("about").blur();
             document.getElementById("special").blur();
@@ -264,6 +283,10 @@ function start(){
             rightPressed = false;
         }else if (e.keyCode == 37) {
             leftPressed = false;
+        }else if (e.keyCode == 65) {
+            aPressed = false;
+        }else if (e.keyCode == 68) {
+            dPressed = false;
         }else if(e.keyCode == 32){       	
             start();
         }  
@@ -271,7 +294,7 @@ function start(){
     function mouseMoveHandler(e) {
         var relativeX = e.clientX - canvas.offsetLeft;
         if(relativeX > 0 && relativeX < canvas.width) {
-            paddleX = relativeX - paddleWidth/2;
+            paddleXs[0] = relativeX - paddleWidth/2;
             // console.log(paddleX);
         }
     }
@@ -335,11 +358,15 @@ function start(){
         ctx.closePath();
     }
     function drawPaddle() {
-        ctx.beginPath();
-        ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
-        ctx.fillStyle = "#0095DD";
-        ctx.fill();
-        ctx.closePath();
+        for(var index in paddleXs){
+            ctx.beginPath();
+            ctx.rect(paddleXs[index], canvas.height-paddleHeight, paddleWidth, paddleHeight);
+            ctx.fillStyle = "#0095DD";
+            if(index == 1)
+                ctx.fillStyle = "#FF8C00";
+            ctx.fill();
+            ctx.closePath(); 
+        }
     }
     function drawBricks() {
         for(r=0; r<brickRowCount; r++) {
@@ -378,14 +405,18 @@ function start(){
     }
     function init(){
         ballRadius = 10;
+        paddlePadding = 100;
         level = document.getElementById("levelSelect").value;
         speed = document.getElementById("speedSelect").value;
+        paddleNum = document.getElementById("paddleSelect").value;
         dx = 1.5*speed;
         dy = -1.5*speed;
         paddleHeight = 10;
         paddleWidth = 75;
         rightPressed = false;
         leftPressed = false;
+        aPressed = false;
+        dPressed = false;
         brickRowCount = brickRowCounts[level-1];
         brickColumnCount = brickColumnCounts[level-1];
         brickWidth = 75;
@@ -402,8 +433,11 @@ function start(){
         x = canvas.width/2;
         y = canvas.height-30;
 
-        paddleX = (canvas.width-paddleWidth)/2;
-
+        if(paddleNum == 1){
+            paddleXs = [(canvas.width-paddleWidth)/2];
+        }else{
+            paddleXs = [(canvas.width-2*paddleWidth-paddlePadding)/2,(canvas.width-2*paddleWidth-paddlePadding)/2+paddleWidth+paddlePadding];
+        }
         for(r=0; r<brickRowCount; r++) {
             bricks[r] = [];
             for(c=0; c<brickColumnCount; c++) {
@@ -430,6 +464,7 @@ function start(){
         cancelAnimationFrame(globalAnimationID);
     }
     function draw() {
+        isBounced = false;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBricks();
         drawBall();
@@ -447,31 +482,42 @@ function start(){
         }
         if(y + dy < ballRadius) {
             dy = -dy;
-        }
-        else if(y + dy > canvas.height-ballRadius) {
-            if(x > paddleX && x < paddleX + paddleWidth) {
-                dy = -dy;
+        }else if(y + dy > canvas.height-ballRadius) {
+            for(var index in paddleXs){
+                if(x > paddleXs[index] && x < paddleXs[index] + paddleWidth) {
+                    dy = -dy;
+                    isBounced = true;
+                    break;
+                }
             }
-            else {
+            if(!isBounced){
                 lives--;
                 if(!lives) {
                     alert("GAME OVER");
                     document.location.reload();
-                }
-                else {
+                }else {
                     x = canvas.width/2;
                     y = canvas.height-30;
+                    dx = Math.abs(dx);
+                    dy = -Math.abs(dy);
                     // dx = 3;
                     // dy = -3;
-                    paddleX = (canvas.width-paddleWidth)/2;
+                    // paddleX = (canvas.width-paddleWidth)/2;
                 }
             }
         }
+       
         // missing code here to update paddle position
-        if(rightPressed && paddleX < canvas.width - paddleWidth){
-            paddleX = paddleX + 10;
-        }else if(leftPressed && paddleX > 0){
-            paddleX = paddleX - 10;
+        if(rightPressed && paddleXs[0] < canvas.width - paddleWidth){
+            paddleXs[0] = paddleXs[0] + 10;
+        }else if(leftPressed && paddleXs[0] > 0){
+            paddleXs[0] = paddleXs[0] - 10;
+        }
+
+        if(dPressed && paddleXs[1] < canvas.width - paddleWidth){
+            paddleXs[1] = paddleXs[1] + 10;
+        }else if(aPressed && paddleXs[1] > 0){
+            paddleXs[1] = paddleXs[1] - 10;
         }
         x += dx;
         y += dy;
@@ -480,7 +526,7 @@ function start(){
     }
     init();
 </script>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="jquery-3.1.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="Bootstrap/js/bootstrap.min.js"></script>
 </body>

@@ -74,13 +74,14 @@ canvas{
 
 .levelDiv{
 	margin: 0 auto;
-	width: 550px;
+	width: 750px;
 	text-align: center;
 	font-weight: bold;
 	color: #286090;
+	margin-bottom: 10px;
 }
 
-#levelSelect,#speedSelect{
+#levelSelect,#speedSelect,#paddleSelect{
 	width: 60px;
 	height: 30px;
     padding: 6px 12px;
@@ -92,8 +93,8 @@ canvas{
     border: 1px solid #ccc;
     border-radius: 4px;
 }
-#speedSelect{
-	margin-right: 5px;
+#levelSelect,#speedSelect,#paddleSelect{
+	margin-right: 10px;
 }
 
 .maxTime > input{
