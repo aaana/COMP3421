@@ -1,0 +1,29 @@
+.div1 {
+    width: 350px;
+    height: 70px;
+    padding: 10px;
+    border: 1px solid #aaaaaa;
+}
+.controlButton{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #286090;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
+.controlButton:hover{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #204d74;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+.controlPannel{
+    margin: 10px auto;
+    width: 480px;
+}  

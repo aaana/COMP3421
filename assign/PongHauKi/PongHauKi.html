@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href="PongHauKiStyle.css">
+<script>
+var neighbours;
+var position;
+var turn;
+var p11,p12,p21,p22;
+var timer;
+var sec;
+//todo 显示时间 人机对战 画棋盘！！ 加油！
+
+function resetTimer(){
+    sec = 20;
+    timer = setInterval(function(){
+        sec --;
+        if(sec <= 0){
+            if(turn == 1){
+                alert("Your time out, Player 2 wins!");
+            }else{
+                alert("Your time out, Player 1 wins!");
+            }
+            stop();
+        }
+    },1000);
+}
+
+function start(){
+    resetTimer();
+    p11.setAttribute("draggable",true);
+    p12.setAttribute("draggable",true);
+    p21.setAttribute("draggable",false);
+    p22.setAttribute("draggable",false);
+}
+
+function stopTimer(){
+    clearInterval(timer);
+}
+
+function init(){
+    neighbours = new Array(5);
+    neighbours["pos1"] = ["pos3","pos4"];
+    neighbours["pos2"] = ["pos3","pos5"];
+    neighbours["pos3"] = ["pos1","pos2","pos4","pos5"];
+    neighbours["pos4"] = ["pos1","pos3","pos5"];
+    neighbours["pos5"] = ["pos2","pos3","pos4"];
+    position = {"p11":"pos1","p12":"pos2","p21":"pos4","p22":"pos5"}
+    turn = 1;
+    p11 = document.getElementById("p11");
+    p12 = document.getElementById("p12");
+    p21 = document.getElementById("p21");
+    p22 = document.getElementById("p22");
+    // alert(p11);
+}
+function allowDrop(ev) {
+    ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text", ev.target.id);
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("text");
+    var sourcePos = position[data];
+    var targetPos = ev.target.id;
+    // alert(sourcePos+"->"+targetPos);
+    if(neighbours[sourcePos].indexOf(targetPos)!=-1){
+        position[data] = targetPos;
+        ev.target.appendChild(document.getElementById(data));
+        if(turn == 1){
+            p11.setAttribute("draggable",false);
+            p12.setAttribute("draggable",false);
+            p21.setAttribute("draggable",true);
+            p22.setAttribute("draggable",true);
+            turn = 2;
+        }else if(turn == 2){
+            p11.setAttribute("draggable",true);
+            p12.setAttribute("draggable",true);
+            p21.setAttribute("draggable",false);
+            p22.setAttribute("draggable",false);
+            turn = 1;
+        }  
+        isFinished();
+        resetTimer();
+    }
+
+}
+
+function stop(){
+    p11.setAttribute("draggable",false);
+    p12.setAttribute("draggable",false);
+    p21.setAttribute("draggable",false);
+    p22.setAttribute("draggable",false);
+    stopTimer();
+}
+
+function isFinished(){
+    if((position["p11"] == "pos1" && position["p12"] == "pos4") || (position["p11"] == "pos4" && position["p12"] == "pos1")){
+        if((position["p21"] == "pos3" && position["p22"] == "pos5") || (position["p21"] == "pos5" && position["p22"] == "pos3")) {
+            alert("Player 2 is the winner!");
+        }
+    }
+    if((position["p11"] == "pos2" && position["p12"] == "pos5") || (position["p11"] == "pos5" && position["p12"] == "pos2")){
+        if((position["p21"] == "pos3" && position["p22"] == "pos4") || (position["p21"] == "pos4" && position["p22"] == "pos3")) {
+            alert("Player 2 is the winner!");
+        }
+    }
+    if((position["p21"] == "pos1" && position["p22"] == "pos4") || (position["p21"] == "pos4" && position["p22"] == "pos1")){
+        if((position["p11"] == "pos3" && position["p12"] == "pos5") || (position["p11"] == "pos5" && position["p12"] == "pos3")){
+            alert("Player 1 is the winner!");
+        }
+    }
+    if((position["p21"] == "pos2" && position["p22"] == "pos5") || (position["p21"] == "pos5" && position["p22"] == "pos2")){
+        if((position["p11"] == "pos3" && position["p12"] == "pos4") || (position["p11"] == "pos4" && position["p12"] == "pos3")){
+            alert("Player 1 is the winner!");
+        }
+    }
+}
+
+</script>
+</head>
+<body onload="init()">
+
+<div>
+    <table width="100%">
+    <tr>
+        <td>
+            <div id="pos1" class="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <img id="p11" src="image/1.png" draggable="false" ondragstart="drag(event)" width="336" height="69">
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div id="pos2" class="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <img id="p12" src="image/1.png" draggable="false" ondragstart="drag(event)" width="336" height="69">
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><div id="pos3" class="div1" ondrop="drop(event)" ondragover="allowDrop(event)"></div></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>
+            <div id="pos4" class="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <img id="p21" src="image/2.png" draggable="false" ondragstart="drag(event)" width="336" height="69">
+            </div>
+        </td>
+        <td></td>
+        <td>
+            <div id="pos5" class="div1" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <img id="p22" src="image/2.png" draggable="false" ondragstart="drag(event)" width="336" height="69">
+            </div>
+        </td>
+    </tr>
+</table>
+</div>
+<div class="controlPannel">
+    <input type="button" style="margin-left:50px" id="startButton" class="controlButton" onclick="start()" value="Start"></input>
+    <input type="button" style="margin-left:200px" class="controlButton" onclick="init()" value="Replay"></input>
+</div>
+
+<!-- 
+<div style="width:350px;height:70px;" ondrop="drop(event)" ondragover="allowDrop(event)">
+	<img id="drag1" src="lab4/chicken.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
+</div> -->
+
+</body>
+</html>
