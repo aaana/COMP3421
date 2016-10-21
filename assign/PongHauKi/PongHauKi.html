@@ -294,7 +294,11 @@ function drop(ev) {
         posStatus[targetPos] = 1;
         finishFlag = isFinished();
         if(finishFlag == 1){
-        	alert("Game Over. Player1 wins!")
+            if(mode == 2){
+                alert("Game Over. You win!")
+            }else{
+                alert("Game Over. Player1 wins!");
+            }
         	stop();
         }else if(finishFlag == 2){
         	alert("Game Over. Player2 wins!")
