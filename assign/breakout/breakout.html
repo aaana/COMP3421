@@ -15,7 +15,7 @@
 
 <div class="levelDiv">
     <span>Level</span>
-    <select id="levelSelect"> 
+    <select onchange="init()" id="levelSelect"> 
         <option>1</option> 
         <option>2</option> 
         <option>3</option> 
@@ -36,7 +36,7 @@
         <input id="inputSecond" onfocus="clearInput(this)" type="text" value="0" /><span>s</span>
     </span>
     <span>Paddle#</span>
-    <select id="paddleSelect"> 
+    <select onchange="init()" id="paddleSelect"> 
         <option>1</option> 
         <option>2</option> 
     </select>
