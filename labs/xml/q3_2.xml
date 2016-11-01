@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="class">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="projects">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="project" type="projectType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			<xs:element name="students">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="student" type="studentType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="studentType">
+			<xs:attribute name="id" type="xs:ID"/>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="e-mail" type="xs:string"/>
+			<xs:attribute name="phone" type="xs:string"/>
+			
+	</xs:complexType>
+	<xs:complexType name="projectType">
+        <xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+            <xs:element name="contacter" type="xs:string"/>
+            <xs:element name="speciality" type="xs:string"/>
+            <xs:element name="chief-supervisor" type="xs:string"/>
+            <xs:element name="co-supervisor" type="xs:string"/>
+            <xs:element name="project-students">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="project-student" type="spType" maxOccurs="3"/>
+						</xs:sequence>
+					</xs:complexType>
+			</xs:element>
+        </xs:sequence>               
+	</xs:complexType>
+	<xs:complexType name="spType">
+		<xs:sequence>
+			<xs:element name="studentId" type="xs:IDREF"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<class>
+  <projects>
+    <project>
+      <name>str1234</name>
+      <contacter>str1234</contacter>
+      <speciality>str1234</speciality>
+      <chief-supervisor>str1234</chief-supervisor>
+      <co-supervisor>str1234</co-supervisor>
+      <project-students>
+        <project-student>
+          <studentId>s1</studentId>
+        </project-student>
+        <project-student>
+          <studentId>s2</studentId>
+        </project-student>
+      </project-students>
+    </project>
+  </projects>
+  <students>
+    <student id="s1" name="str1234" e-mail="str1234" phone="str1234" />
+    <student id="s2" name="str1234" e-mail="str1234" phone="str1234" />
+  </students>
+</class>

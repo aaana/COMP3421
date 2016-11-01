@@ -2,9 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width">
     <title>breakout</title>
     <link href="Bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" type="text/css" href="breakoutStyle.css">
+    <link rel="stylesheet" S="text/css" href="breakoutStyle.css">
 
   </head>
 <body>
@@ -24,7 +25,7 @@
         <option>6</option> 
     </select>
     <span>Speed</span>
-    <select id="speedSelect"> 
+    <select onchange="init()" id="speedSelect"> 
         <option>1</option> 
         <option>2</option> 
         <option>3</option> 
@@ -50,12 +51,13 @@
 
 <canvas id="myCanvas"></canvas>
 <div class="controlPannel">
-    <input type="button" style="margin-left:50px" id="startButton" class="controlButton" onclick="start()" value="Start"></input>
-    <input type="button" style="margin-left:200px" class="controlButton" onclick="init()" value="Replay"></input>
+    <input type="button" id="startButton" class="controlButton" onclick="start()" value="Start"></input>
+    <input type="button" style="margin-left:20px" class="controlButton" onclick="init()" value="Replay"></input>
 </div>
 
-<audio id="countdown" src="countdown.mp3" style="display:none" controls loop ></audio>
-
+<audio id="countdown" style="display:none" controls loop >
+    <source  src="countdown.mp3" type="audio/mpeg">
+</audio>
 <!-- Readme Modal Dialog!!! -->
 <!-- Modal -->
   <div class="modal fade" id="aboutModal" role="dialog">

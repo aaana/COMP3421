@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="class">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="students">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="student" type="studentType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="projects">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="project" type="projectType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	<xs:key name="studentId"> 
+      <xs:selector xpath="./students/student"/> 
+      <xs:field xpath="@id"/> 
+    </xs:key> 
+    <xs:key name="projectId"> 
+      <xs:selector xpath="./projects/project"/> 
+      <xs:field xpath="@id"/> 
+    </xs:key> 
+    <xs:keyref name="studentIdref" refer="studentId"> 
+      <xs:selector xpath="./projects/project/studentId"/> 
+      <xs:field xpath="."/> 
+    </xs:keyref> 
+    <xs:keyref name="projectIdref" refer="projectId"> 
+      <xs:selector xpath="./students/student/projectId"/> 
+      <xs:field xpath="."/> 
+    </xs:keyref> 
+	</xs:element>
+	<xs:complexType name="studentType">
+			<xs:sequence>
+				<xs:element maxOccurs="3" name="projectId" type="xs:NCName"></xs:element>
+			</xs:sequence>
+			<xs:attribute name="id" type="xs:NCName"/>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="e-mail" type="xs:string"/>
+			<xs:attribute name="phone" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="projectType">
+        <xs:sequence>
+			<xs:element name="name" type="xs:string"/>
+            <xs:element name="contacter" type="xs:string"/>
+            <xs:element name="speciality" type="xs:string"/>
+            <xs:element name="chief-supervisor" type="xs:string"/>
+            <xs:element name="co-supervisor" type="xs:string"/>
+			<xs:element maxOccurs="3" name="studentId" type="xs:NCName"></xs:element>
+            </xs:sequence>
+			<xs:attribute name="id" type="xs:NCName"/>         
+	</xs:complexType>
+</xs:schema>

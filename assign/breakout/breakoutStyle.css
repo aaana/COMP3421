@@ -1,4 +1,5 @@
 *{
+	font-family: "Helvetica", "Microsoft YaHei" ;
 	padding: 0; 
 	margin: 0; 
 } 
@@ -88,8 +89,9 @@ canvas{
     font-size: 14px;
     line-height: 1.42857143;
     color: #555;
-    background-color: #fff;
-    background-image: none;
+    /*background-color: #fff;*/
+    /*background-image: none;*/
+    background-color: transparent;
     border: 1px solid #ccc;
     border-radius: 4px;
 }

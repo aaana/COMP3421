@@ -291,6 +291,10 @@
         var startButton = document.getElementById("startButton");
         startButton.value = "Start";
 
+Window.onresize=function(){
+canvas.width=document.documentElement.clientWidth;
+canvas.height=document.documentElement.clientHeight;
+};
         clearInterval(n_timer);
         // stopFlag = true;
         cancelAnimationFrame(globalAnimationID);

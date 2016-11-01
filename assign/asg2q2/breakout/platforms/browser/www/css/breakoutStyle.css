@@ -1,0 +1,108 @@
+*{
+	font-family: "Helvetica", "Microsoft YaHei" ;
+	padding: 0; 
+	margin: 0; 
+} 
+
+canvas{ 
+	background: #eee; 
+	display: block; 
+	margin: 0 auto; 
+} 
+
+.controlPannel{
+	margin: 10px auto; 
+	/*width: 480px;*/
+	text-align: center;
+}   
+
+.controlButton{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #286090;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
+.controlButton:hover{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #204d74;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
+#about,#special{
+	background: transparent;
+	border: none;
+	font-size: 25px;
+	padding: 6px;
+	position: relative;
+	top: 8px;
+
+}
+
+#about:hover{
+
+	color: #204d74;
+}
+
+#about{
+	margin-left: 30px;
+	color: #286090;
+
+}
+#special{
+	margin-left: 10px;
+	color: #F5A9A9;
+}
+
+#special:hover{
+	color: #FA5858;
+}
+
+.gamehead {
+	margin: 10px auto 0 auto;
+	/*width:480px;*/
+	text-align: center;
+	color: black;
+	font-weight: bold;
+	font-size: 18px;
+}
+
+.levelDiv{
+	margin: 0 auto;
+	/*width: 750px;*/
+	text-align: center;
+	font-weight: bold;
+	color: #286090;
+}
+
+select{
+	width: 60px;
+	height: 30px;
+    padding: 6px 10px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    /*background-color: #fff;*/
+    /*background-image: none;*/
+    background-color: transparent;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.maxTime > input{
+	width: 40px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	text-align: right;
+	margin-right: 2px;
+}
+
+

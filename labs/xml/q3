@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:element name="class">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="students">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="student" type="studentType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="projects">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="project" type="projectType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="students-projects">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="student-project" type="spType" maxOccurs="unbounded"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+		
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:key name="studentId"> 
+      <xs:selector xpath="./students/student"/> 
+      <xs:field xpath="@id"/> 
+    </xs:key> 
+    <xs:key name="projectId"> 
+      <xs:selector xpath="./projects/project"/> 
+      <xs:field xpath="@id"/> 
+    </xs:key> 
+    <xs:keyref name="myIdref" refer="myId"> 
+      <xs:selector xpath="./students-projects/student-project"/> 
+      <xs:field xpath="@idrefs"/> 
+    </xs:keyref> 
+	<xs:complexType name="studentType">
+			<xs:attribute name="id" type="xs:NCName"/>
+			<xs:attribute name="name" type="xs:string"/>
+			<xs:attribute name="e-mail" type="xs:string"/>
+			<xs:attribute name="phone" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="projectType">
+			<xs:attribute name="id" type="xs:NCName"/>
+			<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="spType">
+			<xs:attribute name="idrefs" type="xs:NCName"/>
+	</xs:complexType>
+
+	
+</xs:schema>
