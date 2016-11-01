@@ -71,18 +71,34 @@
     var score;
     var lives;
     var bricks;
-    //0:初次开始 1:stop 2:resume
-    var statusFlag;
+    var brickColors;
+    //0:初次开始 1:stop 2:resume -1: init
+    var statusFlag = -1;
     var level;
     var speed;
     var globalAnimationID;
     var countdown;
+    var orient = "portrait";
     // for(r=0; r<brickRowCount; r++) {
     //     bricks[r] = [];
     //     for(c=0; c<brickColomnCount; c++) {
     //         bricks[r][c] = { x: 0, y: 0, status: 1 };
     //     }
     // }
+
+    function doOnOrientationChange(){
+        orient = orient == "portrait"? "landscape":"portrait";
+        resize();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBricks();
+        drawBall();
+        drawPaddle();
+        drawScore();
+        drawLives();
+        drawTimer();
+    }
+
+    window.addEventListener("orientationchange", doOnOrientationChange,false);
     
     document.addEventListener("mousemove", mouseMoveHandler, false);
 
@@ -155,11 +171,11 @@
     function start(){
         var startButton = document.getElementById("startButton");
         if(statusFlag==0){
-            init();
             startButton.value = "Stop";
             n_timer = timer();
-            globalAnimationID = requestAnimationFrame(draw);
             statusFlag = 2;
+            globalAnimationID = requestAnimationFrame(draw);
+
         }else if(statusFlag==1){//stop -> Resume
             startButton.value = "Stop";
             n_timer = timer();
@@ -185,8 +201,8 @@
 	}
 
     function collisionDetection() {
-        for(r=0; r<brickRowCount; r++) {
-            for(c=0; c<brickColumnCount; c++) {
+        for(var r=0; r<brickRowCount; r++) {
+            for(var c=0; c<brickColumnCount; c++) {
                 var b = bricks[r][c];
                 if(b.status == 1) {
                     // if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
@@ -200,8 +216,13 @@
                     // } 
                     if(x > b.x - ballRadius && x < b.x+brickWidth+ballRadius && y > b.y-ballRadius && y < b.y+brickHeight + ballRadius) {
                         dy = -dy;
-                        b.status = 0;
-                        score++;
+                        if(b.hard == 0){
+                            b.status = 0;
+                        }else{
+                            b.hard --;
+                            console.log(b.hard +" " + b.status);
+                        }
+                        score ++;
                         if(isWin()) {
                             alert("YOU WIN, CONGRATS!");
                             document.location.reload();
@@ -230,6 +251,7 @@
         }
     }
     function drawBricks() {
+
         for(r=0; r<brickRowCount; r++) {
             for(c=0; c<brickColumnCount; c++) {
                 if(bricks[r][c].status == 1) {
@@ -240,11 +262,11 @@
                     	bricks[r][c].y = brickY;
                     	ctx.beginPath();
                     	ctx.rect(brickX, brickY, brickWidth, brickHeight);
-                    	ctx.fillStyle = "#0095DD";
+                    	ctx.fillStyle = brickColors[bricks[r][c].hard];
                     	ctx.fill();
                     	ctx.closePath();
                     }else{
-                    	bricks[r][c].status = 0;
+                    	continue;
                     }
                 }
             }
@@ -271,8 +293,39 @@
         }
         ctx.fillText(ele_timer, canvas.width/2-30, 20);
     }
+
+    function resize(){
+        x = x/canvas.width;
+        y = y/canvas.height;
+        for(paddleX in paddleXs){
+            paddleXs[paddleX] = (paddleXs[paddleX] + paddleWidth/2)/ canvas.width; 
+        }
+        if(orient == "portrait"){
+            document.getElementById("myCanvas").width = screen.availWidth - 20;
+            var tempHeight = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +80;
+            document.getElementById("myCanvas").height = tempHeight+160 < screen.availHeight?tempHeight:screen.availHeight-160 ;
+            brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
+        }else{
+            document.getElementById("myCanvas").width = screen.availHeight - 20;
+            var tempHeight = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +80;
+            document.getElementById("myCanvas").height = tempHeight+160 < screen.availWidth?tempHeight:screen.availWidth-160 ;
+            brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
+        }
+        y = y * canvas.height;
+        x = x * canvas.width;
+        for(paddleX in paddleXs){
+            paddleXs[paddleX] =paddleXs[paddleX] * canvas.width - paddleWidth/2; 
+        }
+ 
+    }
+
+    function replay(){
+        statusFlag = -1;
+        init();
+    }
+
     function init(){
-        
+        brickColors = ["#CEECF5","#00BFFF","#0095DD"];
         paddlePadding = 100;
         ballRadius = parseInt(document.getElementById("ballSelect").value)*5;
         level = document.getElementById("levelSelect").value;
@@ -292,14 +345,23 @@
         brickOffsetTop = 30;
         brickOffsetLeft = 10;
         brickHeight = 20;
-        document.getElementById("myCanvas").width = screen.availWidth - 20;
-        var tempHeight = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +80;
-        document.getElementById("myCanvas").height = tempHeight+160 < screen.availHeight?tempHeight:screen.availHeight-160 ;
-        brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding; 
+        if(orient == "landscape"){
+            document.getElementById("myCanvas").width = screen.availHeight - 20;
+            var tempHeight = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +80;
+            document.getElementById("myCanvas").height = tempHeight+160 < screen.availWidth?tempHeight:screen.availWidth-160 ;
+            brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
+        
+        }else{
+            document.getElementById("myCanvas").width = screen.availWidth - 20;
+            var tempHeight = brickOffsetTop + brickRowCount*brickHeight +(brickRowCount-1)*brickPadding + ballRadius*2 +paddleHeight +80;
+            document.getElementById("myCanvas").height = tempHeight+160 < screen.availHeight?tempHeight:screen.availHeight-160 ;
+            brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
+        }
+            
         bricks = [];
         score = 0;
-        lives = 3;
-        statusFlag = 0;
+        lives = 30;
+        // statusFlag = 0;
         // document.getElementById("myCanvas").width = 2*brickOffsetLeft + brickColumnCount*brickWidth +(brickColumnCount-1)*brickPadding;
        
         x = canvas.width/2;
@@ -310,12 +372,18 @@
         }else{
             paddleXs = [(canvas.width-2*paddleWidth-paddlePadding)/2,(canvas.width-2*paddleWidth-paddlePadding)/2+paddleWidth+paddlePadding];
         }
-        for(r=0; r<brickRowCount; r++) {
+        if(statusFlag == -1){
+            for(r=0; r<brickRowCount; r++) {
             bricks[r] = [];
             for(c=0; c<brickColumnCount; c++) {
-                bricks[r][c] = { x: 0, y: 0, status: 1 };
+                var hardness = Math.floor(3*Math.random());
+                console.log(hardness);
+                bricks[r][c] = { x: 0, y: 0, status: 1, hard:hardness };
             }
         }
+        }
+        statusFlag = 0;
+
         countdown = document.getElementById("countdown");
         countdown.pause();
         n_sec = document.getElementById("inputSecond").value==""?0:document.getElementById("inputSecond").value;  //秒
@@ -334,8 +402,9 @@
         startButton.value = "Start";
 
 		Window.onresize=function(){
-		canvas.width=document.documentElement.clientWidth; 
-		canvas.height=document.documentElement.clientHeight;
+            resize();
+		// canvas.width=document.documentElement.clientWidth; 
+		// canvas.height=document.documentElement.clientHeight;
 		};
         clearInterval(n_timer);
         // stopFlag = true;
@@ -399,5 +468,4 @@
         globalAnimationID = requestAnimationFrame(draw);
         console.log(ele_timer);
     }
-
     init();
