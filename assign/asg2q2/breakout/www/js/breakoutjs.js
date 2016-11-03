@@ -70,7 +70,7 @@
     var brickOffsetLeft;
     var score;
     var lives;
-    var bricks;
+    var bricks = [];
     var brickColors;
     //0:初次开始 1:stop 2:resume -1: init
     var statusFlag = -1;
@@ -87,7 +87,7 @@
     // }
 
     function doOnOrientationChange(){
-        orient = orient == "portrait"? "landscape":"portrait";
+        orient = orient == "landscape" ? 'portrait' : 'landscape';
         resize();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBricks();
@@ -325,6 +325,7 @@
     }
 
     function init(){
+        console.log(orient);
         brickColors = ["#CEECF5","#00BFFF","#0095DD"];
         paddlePadding = 100;
         ballRadius = parseInt(document.getElementById("ballSelect").value)*5;
@@ -358,38 +359,38 @@
             brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
         }
             
-        bricks = [];
-        score = 0;
-        lives = 30;
+
         // statusFlag = 0;
         // document.getElementById("myCanvas").width = 2*brickOffsetLeft + brickColumnCount*brickWidth +(brickColumnCount-1)*brickPadding;
        
-        x = canvas.width/2;
-        y = canvas.height-30;
 
-        if(paddleNum == 1){
-            paddleXs = [(canvas.width-paddleWidth)/2];
-        }else{
-            paddleXs = [(canvas.width-2*paddleWidth-paddlePadding)/2,(canvas.width-2*paddleWidth-paddlePadding)/2+paddleWidth+paddlePadding];
-        }
         if(statusFlag == -1){
-            for(r=0; r<brickRowCount; r++) {
-            bricks[r] = [];
-            for(c=0; c<brickColumnCount; c++) {
-                var hardness = Math.floor(3*Math.random());
-                console.log(hardness);
-                bricks[r][c] = { x: 0, y: 0, status: 1, hard:hardness };
+            x = canvas.width/2;
+            y = canvas.height-30;
+
+            if(paddleNum == 1){
+                paddleXs = [(canvas.width-paddleWidth)/2];
+            }else{
+                paddleXs = [(canvas.width-2*paddleWidth-paddlePadding)/2,(canvas.width-2*paddleWidth-paddlePadding)/2+paddleWidth+paddlePadding];
             }
-        }
+            score = 0;
+            lives = 30;
+            for(r=0; r<brickRowCount; r++) {
+                bricks[r] = [];
+                for(c=0; c<brickColumnCount; c++) {
+                    var hardness = Math.floor(3*Math.random());
+                    console.log(hardness);
+                    bricks[r][c] = { x: 0, y: 0, status: 1, hard:hardness };
+                }
+            }
+            countdown = document.getElementById("countdown");
+            countdown.pause();
+            n_sec = document.getElementById("inputSecond").value==""?0:document.getElementById("inputSecond").value;  //秒
+            n_min = document.getElementById("inputMin").value==""?0:document.getElementById("inputMin").value;  //分
+            n_hour = document.getElementById("inputHour").value==""?0:document.getElementById("inputHour").value; //时
+            ele_timer = timeStr(n_hour,n_min,n_sec);
         }
         statusFlag = 0;
-
-        countdown = document.getElementById("countdown");
-        countdown.pause();
-        n_sec = document.getElementById("inputSecond").value==""?0:document.getElementById("inputSecond").value;  //秒
-        n_min = document.getElementById("inputMin").value==""?0:document.getElementById("inputMin").value;  //分
-        n_hour = document.getElementById("inputHour").value==""?0:document.getElementById("inputHour").value; //时
-        ele_timer = timeStr(n_hour,n_min,n_sec);
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBricks();

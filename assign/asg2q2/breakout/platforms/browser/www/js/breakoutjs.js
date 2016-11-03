@@ -70,7 +70,7 @@
     var brickOffsetLeft;
     var score;
     var lives;
-    var bricks;
+    var bricks = [];
     var brickColors;
     //0:初次开始 1:stop 2:resume -1: init
     var statusFlag = -1;
@@ -87,7 +87,7 @@
     // }
 
     function doOnOrientationChange(){
-        orient = orient == "portrait"? "landscape":"portrait";
+        orient = orient == "landscape" ? 'portrait' : 'landscape';
         resize();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawBricks();
@@ -325,6 +325,7 @@
     }
 
     function init(){
+        console.log(orient);
         brickColors = ["#CEECF5","#00BFFF","#0095DD"];
         paddlePadding = 100;
         ballRadius = parseInt(document.getElementById("ballSelect").value)*5;
@@ -358,7 +359,6 @@
             brickWidth = (canvas.width-brickOffsetLeft)/brickColumnCount - brickPadding;
         }
             
-        bricks = [];
         score = 0;
         lives = 30;
         // statusFlag = 0;
