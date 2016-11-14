@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>lab9</title>
+	<script type="text/javascript">
+		var xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			// body...
+			if(xhttp.readyState == 4 && xhttp.status == 200)
+				document.getElementById('demo').innerHTML = xhttp.responseText;
+		};
+		xhttp.open("GET","newfile.txt",true);
+		xhttp.send();
+	</script>
+</head>
+<body>
+<div id="demo"></div>
+</body>
+</html>
