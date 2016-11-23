@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="f7a74163-fddd-4cb9-beb1-47d0c5837ca6" name="link" url="http://csdoor.comp.polyu.edu.hk">
+        <fileTransfer host="csdoor.comp.polyu.edu.hk" port="22" rootFolder="/webhome/16010922x/public_html" accessType="SFTP" password="dfebdfc4dfd3dfc2dfc5dfdddf9bdf9bdf9adf9e" username="16010922X">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

@@ -1,0 +1,125 @@
+*{
+    font-family: "Helvetica", "Microsoft YaHei" ;
+}
+.div1 {
+    /*width: 70px;*/
+    height: 100px;
+    padding: 0px;
+    /*border: 1px solid #aaaaaa;*/
+    box-sizing:initial;
+}
+td{
+    text-align: center;
+    width: 33%;
+}
+.chessBoard{
+    width:500px;
+    background-image: url(resources/chessboard.png);
+    background-repeat: round;
+
+}
+.center{
+    margin: 10px auto 0 auto;
+    text-align: center;
+}
+
+.gamehead,.timer,.totalTime,.turnFlag,.mode{
+    color: black;
+    font-weight: bold;
+}
+.gamehead{
+    font-size: 18px;
+}
+.timer{
+    font-size: 14px;
+    margin-right: 5px;
+    margin-left: 10px;
+}
+.turnFlag{
+    margin-left: 10px;
+}
+.infoPannel{
+    margin: 10px auto 30px auto;
+    text-align: center;
+}
+.controlButton{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #286090;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+
+.controlButton:hover{
+    padding: 6px;
+    border-radius: 3px;
+    border: none;
+    background-color: #204d74;
+    color: white;
+    font-size: 15px;
+    width: 80px;
+} 
+.controlPannel{
+    margin: 40px auto;
+    width: 480px;
+}  
+#about,#special{
+    background: transparent;
+    border: none;
+    font-size: 25px;
+    padding: 6px;
+    position: relative;
+    top: 8px;
+
+}
+
+#about:hover{
+
+    color: #204d74;
+}
+
+#about{
+    margin-left: 10px;
+    color: #286090;
+
+}
+
+#modeSelect{
+    width: 125px;
+    height: 30px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+#pos1 > img{
+    position: relative;
+    left: -79px;
+    top: -22px;
+}
+#pos2 > img{
+    position: relative;
+    left: 79px;
+    top: -19px;
+}
+#pos3 > img{
+    position: relative;
+    top: 17px;
+}
+#pos4 > img{
+    position: relative;
+    top: 57px;
+    left: -79px;
+}
+#pos5 > img{
+    position: relative;
+    top: 60px;
+    left: 82px;
+}
+}
