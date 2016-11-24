@@ -5,52 +5,103 @@
  * Date: 11/21/16
  * Time: 9:13 PM
  */
-
+include "../lib/Socket.php";
+include "../lib/Server.php";
+include "../lib/Connection.php";
 include_once 'game.php';
+
+//$out = fopen("online.txt","r");
+//if (!$out) {
+//    print("Could not read file");
+//    exit;
+//}else{
+//    fputs($out,$user+"\n");
+//}
+//$game = new game();
+//$game->setPosition();
+
 $players[] = array();
 $game[] = array();
 $readyPlayers[] = array();
 $playingPlayers[] =array();
 
-$host = "127.0.0.1";
-$port = "8000";
-set_time_limit(0);
-print("Starting Socket Server...\n");
-$sock = socket_create(AF_INET,SOCK_STREAM,SOL_TCP);
-socket_bind($sock,$host,$port);
-socket_listen($sock,4);
+class Application{
+    private $connections = array();
+    public $server;
 
-print(" Socket Server on work...\n");
+    public function __construct(){
+        $this->server = new Server('localhost', 8001, false);
+        $this->server->setMaxClients(100);
+        $this->server->setCheckOrigin(false);
+        $this->server->setAllowedOrigin('192.168.1.153');
+        $this->server->setMaxConnectionsPerIp(100);
+        $this->server->setMaxRequestsPerMinute(2000);
+        $this->server->setHook($this);
+        $this->server->run();
+    }
+    /* Fired when a socket trying to connect */
+    public function onConnect($connection_id){
+        echo "\nOn connect called : $connection_id";
+        return true;
+    }
 
-function handle(){
+    /* Fired when a socket disconnected */
+    public function onDisconnect($connection_id){
 
+        echo "\nOn disconnect called : $connection_id";
+
+        if(isset($this->connections[$connection_id])){
+            unset($this->connections[$connection_id]);
+        }
+    }
+
+    /* Fired when data received */
+    public function onDataReceive($connection_id,$data){
+        echo "\nData received from $connection_id :";
+
+        $data = json_decode($data,true);
+        print_r($data);
+
+        if(isset($data['action'])){
+            $action = 'action_'.$data['action'];
+            if( method_exists($this,$action)){
+                unset($data['action']);
+                $this->$action($connection_id,$data);
+            }else{
+                echo "\n Caution : Action handler '$action' not found!";
+            }
+        }
+
+    }
+
+    /* Used to send data to particular connection */
+    public function sendDataToConnection($connection_id,$action,$data){
+        $this->server->sendData($connection_id,$action,$data);
+    }
+
+    
+
+    ///// ACTIONS ////
+    public function action_login($connection_id,$data){
+        $this->connections[$connection_id] = max($this->connections) + 1;
+
+        $data = array();
+        $data['user_id'] = $this->connections[$connection_id];
+        $data['users_online'] = count($this->connections);
+        $this->server->sendData($connection_id,'registred',$data);
+    }
+
+    public function action_chat_text($connection_id,$data){
+        $user_id	= $this->connections[$connection_id];
+
+        if(isset($data['chat_text']) && strlen($data['chat_text'])>0){
+            $data['date_time'] = date('H:i:s');
+            foreach($this->connections as $key=>$value){
+                $this->server->sendData($key,'chat_text',$data);
+            }
+        }
+
+    }
 }
+$app = new Application();
 
-do {
-    if($childSocket = socket_accept($sock)<0){
-        $sock.log('Socket error: ' . socket_strerror(socket_last_error($childSocket)));
-    }else{
-        $players[] = new player($childSocket);
-    }
-    foreach ($players as $player){
-//        $incommingData = socket_read($player, 2048);
-//        if (trim($incommingData) == "are you hungry?") {
-//            $response = "Server response > I could eat!\n";
-//            socket_write($player, $response, strlen($response));
-//        } elseif (trim($incommingData) == "exit") {
-//            $response = "Goodbye!\n";
-//            socket_write($player, $response, strlen($response));
-//            socket_close($player);
-//            break;
-//        } else {
-//            $response = strtoupper(trim($incommingData)) . "\n";
-//            $writeResp = socket_write($player, $response, strlen($response));
-//            if ($writeResp === FALSE) {
-//                socket_close($player);
-//                break;
-//            }
-//
-//        }
-    }
-}while(true);
-socket_close($sock);?>

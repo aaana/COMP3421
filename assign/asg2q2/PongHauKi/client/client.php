@@ -8,11 +8,12 @@
  */
 class client
 {
-    private $fp;
+//    private $fp;
 
+    private $socket;
     function __construct()
     {
-        $this->fp = null;
+//        $this->fp = null;
     }
 
     public function createSocket($host,$port){
@@ -22,7 +23,25 @@ class client
             $result = -1;
         }
         return $result;
+//        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+//        if ($this->socket < 0) {
+//            $result = -1;
+//        }else{
+//            $result = $this->connect($this->socket,$host,$port);
+//        }
+//        return $result;
     }
+
+//    private function connect($socket,$ip,$port){
+//        $result = socket_connect($socket, $ip, $port);
+//        return $result;
+//    }
+//
+//    public function send($data){
+//        socket_write($this->socket, $data, strlen($data));
+//    }
+
+
 
     public function send($data){
         if(!$this->fp){

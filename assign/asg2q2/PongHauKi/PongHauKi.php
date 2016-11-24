@@ -1,24 +1,28 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+    <?php
+    session_start(); 
+
+    ?>
 <link href="Bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="PongHauKiStyle.css">
 <script src="jquery-3.1.1.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="Bootstrap/js/bootstrap.min.js"></script>
-    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDLgVhcGQ2taML9OZq0VVehuOlkiXFrKRo"></script>
     <script style="text/javascript">
-        function initMap(grade) {
-            var myLatLng = {lat: -25.363, lng: 131.044};
+        function initMap(id,lat,lng,grade) {
+            var myLatLng = {lat: lat, lng: lng};
             // Create a map object and specify the DOM element for display.
-            var map = new google.maps.Map(document.getElementById('myMap'), {
+            var map = new google.maps.Map(document.getElementById(id), {
                 center: myLatLng,
                 scrollwheel: false,
                 zoom: 15
             });
 
             var infowindow = new google.maps.InfoWindow({
-                content: grade
+                content: grade.toString()
             });
             var marker = new google.maps.Marker({
                 position: myLatLng,
@@ -76,6 +80,14 @@ function movePiece(piece,sourcePos,targetPos){
     document.getElementById(targetPos).appendChild(document.getElementById(piece));
 }
 
+        function updatePos(){
+            posStatus['pos1'] = posStatus['pos2'] = posStatus['pos3'] = posStatus['pos4'] = posStatus['pos5'] = 0;
+            for(var i in position){
+                document.getElementById(position[i]).appendChild(document.getElementById(i));
+                posStatus[i] = 1;
+            }
+        }
+
 function ai(){
     if((position["p11"] == "pos1" && position["p12"] == "pos4") || (position["p11"] == "pos4" && position["p12"] == "pos1")){
         if(position["p21"]=="pos3"){
@@ -123,9 +135,9 @@ function ai(){
 }
 
 function resetTimer(){
-	countdownAudio.pause();
-	sec = 20;
-	countdown.style.color = "black";
+    countdownAudio.pause();
+    sec = 20;
+    countdown.style.color = "black";
 }
 
 function startTimer(){
@@ -145,21 +157,21 @@ function startTimer(){
         ele_timer = timeStr(n_hour,n_min,n_sec)
         totalTime.innerHTML = ele_timer;
         if(sec <= 5){
-        	countdown.style.color = "red";
-        	countdownAudio.play();
+            countdown.style.color = "red";
+            countdownAudio.play();
         }
         if(sec <= 0){
             stop();
             if(turn == 1){
                 finishFlag = 2;
-                if(mode == 1){
+                if(mode == 2){
                     alert("Your time out, Player 2 wins!");
                 }else{
                     alert("Your time out, Computer wins!");
                 }
             }else{
                 finishFlag = 1;
-                if(mode == 1){
+                if(mode == 2){
                     alert("Your time out, Player 1 wins!");
                 }else{
                     alert("Your time out, Computer wins!");
@@ -175,35 +187,79 @@ function stopTimer(){
 }
 
 // function strTimer(sec){
-// 	var str_sec = sec;
-// 	if(sec<10){
-// 		str_sec = "0" + sec;
-// 	}
-// 	return str_sec;
+//  var str_sec = sec;
+//  if(sec<10){
+//      str_sec = "0" + sec;
+//  }
+//  return str_sec;
 // }
 
+        function updateStartButton(status) {
+            if(status == 1){
+                startButton.value = "Start";
+            }else if(status == 0){
+                startButton.value = 'Stop';
+            }else{
+                startButton.value = 'Resume';
+            }
+
+        }
+
 function start(){
-    mode = document.getElementById("modeSelect").value;
-    setTurn();
-	if(status == 1){// first start
-		resetTimer();
-		startTimer();
-    	p11.setAttribute("draggable",true);
-    	p12.setAttribute("draggable",true);
-    	p21.setAttribute("draggable",false);
-    	p22.setAttribute("draggable",false);
-    	status = 0;
-    	startButton.value = "Stop";
-	}else if(status==0){ //to stop
-		stop();
-		status = 2;
-		startButton.value = "Resume";
-	}else{ // stop - >resume
-		startTimer();
-		setTurn();
-		status = 0;
-		startButton.value = "Stop";
-	}
+    <?if(isset($_SESSION['mode'])){?>
+    mode =<?echo $_SESSION['mode'];?>;
+    <?}else{?>
+        mode = document.getElementById("modeSelect").value;
+    <?}?>
+
+    if(status == 1){// first start
+        setTurn();
+        resetTimer();
+        startTimer();
+        status = 0;
+        if(mode == 2){
+            send(function () {
+
+            },6,null);
+//            setInterval(getGameStatus,500);
+            <?if(isset($_SESSION['playerNum']) &&$_SESSION['playerNum'] == 1){?>
+            p11.setAttribute("draggable",true);
+            p12.setAttribute("draggable",true);
+            p21.setAttribute("draggable",false);
+            p22.setAttribute("draggable",false);
+            <?}else{?>
+            p11.setAttribute("draggable",false);
+            p12.setAttribute("draggable",false);
+            p21.setAttribute("draggable",false);
+            p22.setAttribute("draggable",false);
+            <?}?>
+            send(function () {
+            },4,{'turn':1,'status':0,'position':position});
+        }
+
+        startButton.value = "Stop";
+    }else if(status==0){ //to stop
+        stop();
+        status = 2;
+        startButton.value = "Resume";
+        if(mode == 2){
+            send(function () {
+
+            },4,{'turn':1,'status':0,'position':position});
+        }
+
+    }else{ // stop - >resume
+        startTimer();
+        setTurn();
+        status = 0;
+        startButton.value = "Stop";
+        if(mode ==2){
+            send(function () {
+
+            },4,{'turn':1,'status':0,'position':position});
+        }
+
+    }
 
 
 }
@@ -218,6 +274,7 @@ function stop(){
 }
 
 function init(){
+
     neighbours = new Array(5);
     neighbours["pos1"] = ["pos3","pos4"];
     neighbours["pos2"] = ["pos3","pos5"];
@@ -246,7 +303,12 @@ function init(){
     countdown.innerHTML = "20";
     turnFlag = document.getElementById("turn");
     turnFlag.style.color = "#61afea"
-    turnFlag.innerHTML = "Player1";
+    <?if(isset($_SESSION['username'])){?>
+    turnFlag.innerHTML = "<?echo $_SESSION['username'];?>";
+    <?}else{?>
+    turnFlag.innerHTML = "Player";
+<?}?>
+
     startButton = document.getElementById("startButton");
     startButton.value = "Start";
     var pos1 = document.getElementById("pos1");
@@ -262,30 +324,59 @@ function init(){
     // alert(p11);
 }
 function setTurn(){
-	if(turn == 1){
-        p11.setAttribute("draggable",true);
-        p12.setAttribute("draggable",true);
-        p21.setAttribute("draggable",false);
-        p22.setAttribute("draggable",false);
-        turnFlag.style.color = "#61afea";
-        if(mode == 1){
-            turnFlag.innerHTML = "Player1";
+    <?if(isset($_SESSION['playerNum'])){?>
+
+    if(mode == 2){
+        var player = <?echo $_SESSION['playerNum'];?>;
+        if(player == turn){
+            if(turn == 1){
+                p11.setAttribute("draggable",true);
+                p12.setAttribute("draggable",true);
+                p21.setAttribute("draggable",false);
+                p22.setAttribute("draggable",false);
+                turnFlag.style.color = "#61afea";
+            }else{
+                p11.setAttribute("draggable",false);
+                p12.setAttribute("draggable",false);
+                p21.setAttribute("draggable",true);
+                p22.setAttribute("draggable",true);
+                turnFlag.style.color = "#e4760f";
+            }
+            turnFlag.innerHTML = '<?echo $_SESSION['username'];?>';
+
         }else{
-            turnFlag.innerHTML = "Player";
+                p11.setAttribute("draggable",false);
+                p12.setAttribute("draggable",false);
+                p21.setAttribute("draggable",false);
+                p22.setAttribute("draggable",false);
+                if(turn == 1){
+                    turnFlag.style.color = "#61afea";
+                }else{
+                    turnFlag.style.color = "#e4760f";
+                }
+                turnFlag.innerHTML = '<?echo $_SESSION['competitor']['name'];?>';
         }
-    }else if(turn == 2){
-        turnFlag.style.color = "#e4760f";
-        if(mode == 1){
-            p11.setAttribute("draggable",false);
-            p12.setAttribute("draggable",false);
-            p21.setAttribute("draggable",true);
-            p22.setAttribute("draggable",true);
-            turnFlag.innerHTML = "Player2";
+
+    }
+    <?}?>
+    if(mode == 1) {
+        if(turn == 1){
+            p11.setAttribute("draggable",true);
+            p12.setAttribute("draggable",true);
+            p21.setAttribute("draggable",false);
+            p22.setAttribute("draggable",false);
+            turnFlag.style.color = "#61afea";
+            var turnFlagText = "Player";
+            <?if(isset($_SESSION['username'])){?>
+                var turnFlagText = <?echo $_SESSION['username'];?>;
+            <?}?>
+            turnFlag.innerHTML = turnFlagText;
         }else{
             p11.setAttribute("draggable",false);
             p12.setAttribute("draggable",false);
             p21.setAttribute("draggable",false);
             p22.setAttribute("draggable",false);
+            turnFlag.style.color = "#e4760f";
             turnFlag.innerHTML = "Computer";
         }
 
@@ -313,26 +404,32 @@ function drop(ev) {
         posStatus[targetPos] = 1;
         finishFlag = isFinished();
         if(finishFlag == 1){
-            if(mode == 2){
+            if(mode == 1){
                 alert("Game Over. You win!")
             }else{
                 alert("Game Over. Player1 wins!");
             }
-        	stop();
+            stop();
         }else if(finishFlag == 2){
-        	alert("Game Over. Player2 wins!")
-        	stop();
+            alert("Game Over. Player2 wins!")
+            stop();
         }else{
-        	stopTimer();
-        	resetTimer();
-        	startTimer();
+            stopTimer();
+            resetTimer();
+            startTimer();
             if(turn == 1){
                 turn = 2;
             }else{
                 turn = 1;
             }
             setTurn();
-            if(mode == 2 && turn == 2){
+            if(mode == 2){
+                  send(function () {
+
+            },4,{'turn':turn,'status':status,'position':position});
+            }
+          
+            if(mode == 1 && turn == 2){
                 setTimeout(function(){
                     ai();
                     turn = 1;
@@ -355,6 +452,8 @@ function drop(ev) {
     }
 
 }
+
+
 
 function isFinished(){
     if((position["p11"] == "pos1" && position["p12"] == "pos4") || (position["p11"] == "pos4" && position["p12"] == "pos1")){
@@ -379,6 +478,8 @@ function isFinished(){
     }
     return -1;
 }
+        
+
 
 
 </script>
@@ -386,6 +487,9 @@ function isFinished(){
 <body onload="init()">
 
 <div  class="col-sm-3" style="margin-top: 10px;">
+    <?php
+    if (!isset($_SESSION['username'])){
+    ?>
     <span id="greeting">Hello , Please login first!</span></br>
     <div id="authPanel">
         <!-- Nav tabs -->
@@ -417,7 +521,10 @@ function isFinished(){
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-3 col-sm-9">
+                        <div class="col-sm-5">
+                            <button id="locate" type="button" class="btn btn-default">Locate</button>
+                        </div>
+                        <div class="col-sm-5">
                             <button type="submit" class="btn btn-default">Register</button>
                         </div>
                     </div>
@@ -447,6 +554,10 @@ function isFinished(){
         </div>
 
     </div>
+<?}else{?>
+        <span id="greeting">Hello , <?echo $_SESSION['username'];?></span>
+        <button id="logout">Logout</button>
+    <?}?>
     <div id="myMap" style="height:300px;"></div>
 </div>
 
@@ -455,13 +566,13 @@ function isFinished(){
         Pong Hau Ki
     </div>
     <div class="infoPannel">
-	<span>
-		<span class="mode">Mode</span>
-		<select id="modeSelect">
-            <option value="1">Player-Player</option>
-            <option value="2">Computer-Player</option>
+    <span>
+        <span class="mode">Mode</span>
+        <select onchange="modeChange(this)" id="modeSelect">
+            <option value="1">Computer-Player</option>
+            <option value="2">Player-Player</option>
         </select>
-	</span>
+    </span>
 
     <span class="timer">
         <span>Timer:</span>
@@ -472,8 +583,8 @@ function isFinished(){
         <span id="totalTime"></span>
     </span>
     <span class="turnFlag">
-    	<span>Turn:</span>
-    	<span id="turn"></span>
+        <span>Turn:</span>
+        <span id="turn"></span>
     </span>
         <button type="button" id="about" data-toggle="modal" data-target="#aboutModal">
             <span class="glyphicon glyphicon-info-sign" ></span>
@@ -523,7 +634,16 @@ function isFinished(){
 </div>
 
 <div id="competitor" class="col-sm-3">
-    <div id="competitorMap" style="height:300px;"></div>
+    <?php
+    if(isset($_SESSION['competitor'])){
+    ?>
+        <span style="margin-top: 10px" id="competitorName">Your competitor:<?echo $_SESSION['competitor']['name'];?></span>
+        <div id="competitorMap" style="height:300px;"></div>
+
+    <?}else{?>
+    <span id="competitorName"></span>
+        <div id="competitorMap" style="height:300px;"></div>
+    <?}?>
 </div>
 
 <audio id="countdownAudio" src="resources/countdown.mp3" style="display:none" controls loop ></audio>
@@ -559,11 +679,94 @@ function isFinished(){
 
 <!-- 
 <div style="width:350px;height:70px;" ondrop="drop(event)" ondragover="allowDrop(event)">
-	<img id="drag1" src="lab4/chicken.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
+    <img id="drag1" src="lab4/chicken.gif" draggable="true" ondragstart="drag(event)" width="336" height="69">
 </div> -->
 
 </body>
 <script>
+
+    <?if(isset($_SESSION["mode"])){?>
+    $('#modeSelect').val(<?echo $_SESSION["mode"];?>);
+    <?}?>
+
+    <?php if(isset($_SESSION['username'])){?>
+    initMap('myMap',<?echo $_SESSION['lat'];?>,<?echo $_SESSION['lng'];?>,<?echo json_encode($_SESSION['grade']);?>);
+    <?}?>
+    <?php if(isset($_SESSION['competitor'])){?>
+//    $('#competitorName').text('Your competitor:'+'<?//echo $_SESSION['competitor']['name']?>//');
+    initMap('competitorMap',<?echo $_SESSION['competitor']['lat'];?>,<?echo $_SESSION['competitor']['lng'];?>,<?echo json_encode($_SESSION['competitor']['grade']);?>);
+    $('#competitorMap').attr('display','block');
+    <?}?>
+    var geocoder = new google.maps.Geocoder;
+    function getLocation()
+    {
+        if (navigator.geolocation)
+        {
+            navigator.geolocation.getCurrentPosition(function (pos) {
+                var latlng = new google.maps.LatLng(pos.coords.latitude,pos.coords.longitude);
+                geocoder.geocode({'location': latlng}, function(results, status) {
+                    if (status === google.maps.GeocoderStatus.OK) {
+                        if (results[1]) {
+                            $('#location').val( results[1].formatted_address);
+                        }
+                    }
+                });
+            });
+        }
+        setTimeout(function(){
+              if($('#location').val() == ''){
+                alert("can not obtain the location, please set the privacy or enter manually");
+                $('#location').focus();
+            }
+        },3000);
+    
+    }
+    
+    $('#locate').click(function () {
+        getLocation();
+    });
+        
+//    function connect(serverUrl) {
+//        if (window.MozWebSocket) {
+//            socket = new MozWebSocket(serverUrl);
+//        } else if (window.WebSocket) {
+//            socket = new WebSocket(serverUrl);
+//        }
+//        socket.binaryType = 'blob';
+//        socket.onopen = function (msg) {
+//            return true;
+//        };
+//        socket.onmessage = function (msg) {
+//            var response;
+//            response = JSON.parse(msg.data);
+//            return true;
+//        };
+//        socket.onclose = function (msg) {
+//
+//        }
+//    }
+
+//    //address -> geocoding
+//    function getGeoCoding(address) {
+//        geocoder.geocode( { 'address': address}, function(results, status) {
+//            if (status == google.maps.GeocoderStatus.OK) {
+//                return {'lng':results[0].geometry.location[1],'lat':results[0].geometry.location[0]};
+//            }
+//        });
+//    }
+//
+    //reverse 纬经度 -> 地址
+//    function getAddress(lat,lng) {
+//        var latlng = new google.maps.LatLng(lat,lng);
+//        geocoder.geocode({'location': latlng}, function(results, status) {
+//            if (status === google.maps.GeocoderStatus.OK) {
+//                if (results[1]) {
+//                    return results[1].formatted_address
+//                }
+//            }
+//        });
+//    }
+
         $('#registerForm').submit(function (event) {
             event.preventDefault(); // Prevent the form from submitting via the browser
             var form = $(this);
@@ -577,26 +780,40 @@ function isFinished(){
                 alert("Please enter your location!");
                 $("#location").focus();
             }else{
-                $.ajax({
-                    type: "post",
-                    url: "register.php",
-                    data: form.serialize(),
-                    dataType:"json",
-                    success:function (data) {
-                        if(data.success == 1){
-                            alert("Register succeeds!Ready to login");
-                            $('#loginName').val($('#registerName').val());
-                            $('#loginPwd').val($('#registerPwd').val());
-                            $('ul > li:first-child').removeClass("active");
-                            $('ul > li:nth-child(2)').addClass("active");
-                            $('#registerPanel').removeClass("active");
-                            $('#loginPanel').addClass("active");
-                        }
-                    },
-                    error: function () {
-                        alert("fail");
+                geocoder.geocode( { 'address': $('#location').val()}, function(results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        var location = [results[0].geometry.location.lat(),results[0].geometry.location.lng()];
+                        $.ajax({
+                            type: "post",
+                            url: "register.php",
+                            data: {
+                                'username':$('#registerName').val(),
+                                'password':$('#registerPwd').val(),
+                                'location':location,
+                            },
+                            dataType:"json",
+                            success:function (data) {
+                                if(data.success == 1){
+                                    alert("Register succeeds!Ready to login");
+                                    $('#loginName').val($('#registerName').val());
+                                    $('#loginPwd').val($('#registerPwd').val());
+                                    $('ul > li:first-child').removeClass("active");
+                                    $('ul > li:nth-child(2)').addClass("active");
+                                    $('#registerPanel').removeClass("active");
+                                    $('#loginPanel').addClass("active");
+                                }else if(data.success == -1){
+                                    alert("User exists");
+                                    $('#registerName').val('');
+                                    $('#registerName').focus();
+                                }
+                            },
+                            error: function (e) {
+                                alert(e.responseText);
+                            }
+                        })
                     }
-                })
+                });
+
             }
 
         });
@@ -616,6 +833,17 @@ function isFinished(){
 
         }
 
+    $('#logout').click(function () {
+        alert("Logout clicked!");
+        send(function (data) {
+            if (data.success == 1) {
+                console.log("success");
+                alert(data.user + " exits");
+                window.location.href = 'PongHauKi.php';
+            }
+        }, -1, $('#loginName').val());
+    });
+
     $('#loginForm').submit(function (event) {
         event.preventDefault();
         if($('#loginName').val() === ""){
@@ -624,35 +852,52 @@ function isFinished(){
         }else if($('#loginPwd').val() === ""){
             alert("Please enter your password!");
             $('#loginPwd').focus();
-        }else{
+        }else {
             send(function (data) {
-                if(data.success == 1){
+                if (data.success == 1) {
                     alert("Login succeeds!");
                     $('#authPanel').slideUp();
-                    initMap(data.grade);
-                    $('#greeting').text("Hello, "+ $('#loginName').val());
+                    initMap('myMap',data.lat, data.lng, data.grade);
+                    $('#greeting').text("Hello, " + $('#loginName').val());
                     $('#greeting').after('<button id="logout">Logout</button>');
+                    location.reload(); 
 
-                    $('#logout').click(function () {
-                        alert("Logout clicked!");
-                        //todo confirm exit
-                        send(function (data) {
-                            if(data.success == 1){
-                                alert('exit!');
-                                window.location.href = "PongHauKi.php";
-                            }
+//                        $.ajax({
+//                            type: 'post',
+//                            data: $('#loginName').val(),
+//                            dataType: 'json',
+//                            url: "logout.php",
+//                            success: function (data) {
+//                                if (data.success == 1) {
+//                                    console.log("success");
+//                                    alert(data.user + " exits");
+//                                    window.location.href = 'PongHauKi.php';
+//                                }
+//                            },
+//                            error: function (e) {
+//                                alert("error" + e.responseText);
+//                            }
+//                        })
+//                    });
+//                        connect('ws://localhost:8000');
+//                        payload = new Object();
+//                        payload.action = 'login';
+//                        socket.send(JSON.stringify(payload));
 
-                        },-1)
-                    });
-                }else if(data.success == 2){
+                } else if (data.success == 2) {
                     alert("Register first!");
                     $('ul > li:first-child').addClass("active");
                     $('ul > li:nth-child(2)').removeClass("active");
                     $('#registerPanel').addClass("active");
                     $('#loginPanel').removeClass("active");
                     $('#registerName').focus();
+                } else if (data.success == 3) {
+                    alert("Wrong password!");
+                    $('#loginPwd').val('');
+                    $('#loginPwd').focus();
                 }
-            },0,{'username':$('#loginName').val(),'password':$('#loginPwd').val()});
+            }, 0, {'username': $('#loginName').val(), 'password': $('#loginPwd').val()});
+        }
 //            $.ajax({
 //                type:"post",
 //                url:"login.php",
@@ -662,9 +907,33 @@ function isFinished(){
 //                    if(data.success == 1){
 //                        alert("Login succeeds!");
 //                        $('#authPanel').slideUp();
-//                        initMap(data.grade);
+//                        initMap(data.lat,data.lng,data.grade.toString());
 //                        $('#greeting').text("Hello, "+ $('#loginName').val());
-//                        $('#greeting').after('<button>Logout</button>');
+//                        $('#greeting').after('<button id="logout">Logout</button>');
+//                        $('#logout').click(function () {
+//                            alert("Logout clicked!");
+//                            $.ajax({
+//                                type:'post',
+//                                data:$('#loginName').val(),
+//                                dataType:'json',
+//                                url:"logout.php",
+//                                success:function (data) {
+//                                    if(data.success == 1){
+//                                        console.log("success");
+//                                        alert(data.user + " exits");
+//                                        window.location.href = 'PongHauKi.php';
+//                                    }
+//                                },
+//                                error:function (e) {
+//                                    alert("error"+e.responseText);
+//                                }
+//                            })
+//                        });
+////                        connect('ws://localhost:8000');
+////                        payload = new Object();
+////                        payload.action = 'login';
+////                        socket.send(JSON.stringify(payload));
+//
 //                    }else if(data.success == 2){
 //                        alert("Register first!");
 //                        $('ul > li:first-child').addClass("active");
@@ -672,11 +941,102 @@ function isFinished(){
 //                        $('#registerPanel').addClass("active");
 //                        $('#loginPanel').removeClass("active");
 //                        $('#registerName').focus();
+//                    }else if(data.success == 3){
+//                        alert("Wrong password!");
+//                        $('#loginPwd').val('');
+//                        $('#loginPwd').focus();
 //                    }
 //                }
 //            })
-        }
+
     });
+
+    var intervalId;
+    var findCompetitor = function () {
+        send(function (result) {
+            // alert(result.success);
+            if(result.success == 2){
+//                alert("There is no competitor right now.You can play with computer and try again later.");
+                $('#competitorName').text("Waiting for competitor");
+            }else if(result.success == 1){
+                alert("Your competitor is " + result.competitor.name);
+
+                clearInterval(intervalId);
+                $('#competitorName').text("Your competitor: "+result.competitor.name);
+                $("#competitorMap").css('display','block');
+                initMap('competitorMap',result.competitor.lat,result.competitor.lng,result.competitor.grade);
+                $("#competitorMap").slideDown();
+                $('#modeSelect').attr('disabled','disabled');
+                if(result.playerNum==1){
+                turnFlag.style.color = "#61afea";
+                turnFlag.innerHTML = result.username;
+                location.reload();
+            }else{
+                turnFlag.style.color = "#e4760f";
+                turnFlag.innerHTML = result.competitor.name; 
+            }
+            }
+        },3,null);
+    };
+
+    var gameId = setInterval(send(function(data){
+        if(data.success == 1){
+            clearInterval(gameId);
+             statusIntervalId = setInterval(function () {
+                <?if(file_exists('game.json')){?>
+                getGameStatus();
+                <?}else if(isset($_SESSION['competitor'])){?>
+                            alert('Game over!The competitor exits');
+                        clearInterval(statusIntervalId);
+                    <?}?>
+            },500);
+        }
+    },7,null));
+
+
+
+    var getGameStatus = function () {
+        send(function (data) {
+            turn = data.turn;
+            status = data.status;
+            position = data.position;
+            // if(status == -1){
+            //     alert('The competitor exits!');
+            //     clearInterval(statusIntervalId);
+            // }
+            setTurn();
+            updatePos();
+            updateStartButton(status);
+        },5,null)
+    };
+
+    function modeChange(self){
+            <?if(isset($_SESSION['username'])){?>
+                    send(function (data) {
+                        // alert(data.mode);
+                        if (data.mode == 2) {
+                            intervalId = setInterval(findCompetitor, 1000);
+        //                send(function (result) {
+        //                    alert(result.success);
+        //                    if(result.success == 2){
+        //                        alert("There is no competitor right now.You can play with computer and try again later.");
+        //                        setInterval()
+        //                    }else if(result.success == 1){
+        //                        alert("Your competitor is " + result.competitor);
+        //                    }
+        //                },3,null);
+                        } else {
+                            if (intervalId)
+                                clearInterval(intervalId);
+                            location.reload();
+                        }
+
+                    }, 2, {'mode': self.value});
+            <?}else{?>
+            if(self.value == 2)
+                alert("Please login!");
+            <?}?>
+    }
 </script>
 
 </html>

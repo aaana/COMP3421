@@ -11,12 +11,16 @@ class player
     private $username;
     private $competitor;
     private $game;
-    private $state;
-    private $socket;
+//    private $state;
+//    private $socket;
     
-    function __construct($socket)
+//    function __construct($socket)
+//    {
+//        $this->socket = $socket;
+//    }
+    function __construct($name)
     {
-        $this->socket = $socket;
+       $this->username = $name;
     }
     
     function setUsername($name){
@@ -29,9 +33,9 @@ class player
     function setGame($game){
         $this->game = $game;
     }
-    function setState($state){
-        $this->state = $state;
-    }
+//    function setState($state){
+//        $this->state = $state;
+//    }
     
     function getUsername(){
         return $this->username;
@@ -45,10 +49,10 @@ class player
         return $this->game;
     }
     
-    function getState(){
-        return $this->state;
-    }
-    
+//    function getState(){
+//        return $this->state;
+//    }
+//    
     
 
 }
