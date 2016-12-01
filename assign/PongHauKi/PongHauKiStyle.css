@@ -14,7 +14,7 @@ td{
 }
 .chessBoard{
     width:500px;
-    background-image: url(chessboard.png);
+    background-image: url(resources/chessboard.png);
     background-repeat: round;
 
 }
@@ -121,5 +121,4 @@ td{
     position: relative;
     top: 60px;
     left: 82px;
-}
 }

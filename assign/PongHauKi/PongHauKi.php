@@ -876,7 +876,7 @@ function isFinished(){
             send(function (data) {
                 if (data.success == 1) {
                     alert("Login succeeds!");
-                    $('#authPanel').slideUp();
+                    // $('#authPanel').slideUp();
                     initMap('myMap',data.lat, data.lng, data.grade);
                     $('#greeting').text("Hello, " + "<?if(isset($_SESSION['username'])) echo $_SESSION['username'];?>");
                     $('#greeting').after('<button id="logout">Logout</button>');
@@ -909,7 +909,9 @@ function isFinished(){
             if(result.success == 2){
 //                alert("There is no competitor right now.You can play with computer and try again later.");
                 $('#competitorName').text("Waiting for competitor");
+                document.getElementById('startButton').disabled = true;
             }else if(result.success == 1){
+                document.getElementById('startButton').disabled = false;
                 alert("Your competitor is " + result.competitor.name);
 
                 clearInterval(intervalId);
